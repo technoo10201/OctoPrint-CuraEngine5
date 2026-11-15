@@ -290,3 +290,10 @@ def test_api_slice_refused_while_printing(plugin, printing, paused):
         resp = fn(plugin)
     assert resp.status_code == 409
     assert "disabled while printing" in resp.get_data(as_text=True)
+
+
+def test_software_update_information(plugin):
+    info = plugin.get_update_information()["curaengine5"]
+    assert info["type"] == "github_release"
+    assert (info["user"], info["repo"]) == ("technoo10201", "OctoPrint-CuraEngine5")
+    assert info["pip"].endswith("/archive/{target_version}.zip")

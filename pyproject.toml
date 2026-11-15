@@ -9,7 +9,7 @@ description = "OctoPrint slicer plugin for CuraEngine 5.x (unofficial)"
 readme = "README.md"
 authors = [{ name = "technoo10201" }]
 license = { text = "AGPL-3.0-or-later" }
-requires-python = ">=3.7, <4"
+requires-python = ">=3.9, <4"
 dependencies = []
 classifiers = [
     "Framework :: OctoPrint",

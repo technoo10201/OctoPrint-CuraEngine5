@@ -23,7 +23,7 @@ from .slicing import engine, stl as stl_mod
 from .slicing.job import merge_machine_config, slice_model
 
 __plugin_name__ = "CuraEngine 5 Slicer"
-__plugin_pythoncompat__ = ">=3.7,<4"
+__plugin_pythoncompat__ = ">=3.9,<4"
 
 SLICER_TYPE = "curaengine5"
 PROFILE_FORMAT = "curaengine5/1"
@@ -251,6 +251,23 @@ class CuraEngine5Plugin(
         if printer is not None:
             return printers_mod.machine_config(printer), printer
         return self._machine_config(), None
+
+    # ------------------------------------------------------------------
+    # Software Update
+
+    def get_update_information(self):
+        version = getattr(self, "_plugin_version", None)
+        return {
+            "curaengine5": {
+                "displayName": __plugin_name__,
+                "displayVersion": version,
+                "type": "github_release",
+                "user": "technoo10201",
+                "repo": "OctoPrint-CuraEngine5",
+                "current": version,
+                "pip": "https://github.com/technoo10201/OctoPrint-CuraEngine5/archive/{target_version}.zip",
+            }
+        }
 
     # ------------------------------------------------------------------
     # SlicerPlugin
@@ -1123,5 +1140,5 @@ def _slugify(name):
 __plugin_implementation__ = CuraEngine5Plugin()
 __plugin_hooks__ = {
     "octoprint.server.http.bodysize": __plugin_implementation__.bodysize_hook,
-    # TODO: add "octoprint.plugin.softwareupdate.check_config" once the repository is public.
+    "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
 }

@@ -19,7 +19,7 @@ An [OctoPrint](https://octoprint.org) plugin that slices STL files with **CuraEn
 
 ## Requirements
 
-- OctoPrint 1.10 or later (tested with 1.11.8), Python 3.7+.
+- OctoPrint 1.10 or later (tested with 1.11.8), Python 3.9+.
 - A **CuraEngine 5.x** binary for the machine running OctoPrint, plus the matching **`share/cura/resources`** folder from the same Cura version.
 - Linux with **glibc 2.35 or later** for the CuraEngine shipped in UltiMaker's 5.11 AppImage (x86_64 only; glibc 2.36 for the ARM binaries built by this repository's scripts, which target Raspberry Pi OS / Debian 12 Bookworm). The ARM 32-bit build requires an ARMv7 CPU (Raspberry Pi 2 and later, not the Pi Zero / Pi 1). OctoPi 1.1 / Raspberry Pi OS Bookworm (glibc 2.36) works; the official `octoprint/octoprint` Docker image (Debian 11, glibc 2.31) does **not**.
 
