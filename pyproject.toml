@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "OctoPrint-CuraEngine5"
-version = "0.1.0"
+version = "0.1.1"
 description = "OctoPrint slicer plugin for CuraEngine 5.x (unofficial)"
 readme = "README.md"
 authors = [{ name = "technoo10201" }]
