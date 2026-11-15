@@ -7,6 +7,8 @@ the ``.github/workflows/build-curaengine.yml`` workflow:
 
     curaengine-<version>-linux-<arch>/
         CuraEngine
+        lib/                      (shared libraries found through the engine's RPATH)
+        NOTICE
         resources/{definitions,extruders,quality,intent,variants,materials}/
         LICENSES/
         VERSION
@@ -18,6 +20,7 @@ import logging
 import os
 import platform
 import shutil
+import struct
 import tarfile
 import tempfile
 import urllib.request
@@ -27,7 +30,8 @@ _logger = logging.getLogger(__name__)
 ENGINE_VERSION = "5.11.0"
 #: Minimum glibc of the workflow binaries (built in Debian 12 Bookworm).
 MIN_GLIBC = (2, 36)
-SUPPORTED_ARCHES = {"aarch64": "aarch64", "arm64": "aarch64", "x86_64": "x86_64", "amd64": "x86_64"}
+SUPPORTED_ARCHES = {"aarch64": "aarch64", "arm64": "aarch64", "x86_64": "x86_64", "amd64": "x86_64",
+                    "armv7l": "armv7hf", "armv8l": "armv7hf"}
 MAX_DOWNLOAD = 300 * 1024 * 1024
 
 
@@ -36,7 +40,12 @@ class InstallError(Exception):
 
 
 def current_arch():
-    return SUPPORTED_ARCHES.get(platform.machine().lower())
+    arch = SUPPORTED_ARCHES.get(platform.machine().lower())
+    # 64-bit kernel with a 32-bit userland (e.g. 32-bit Raspberry Pi OS on a Pi 4): the
+    # Python interpreter, and so any binary we install, is 32-bit
+    if arch == "aarch64" and struct.calcsize("P") == 4:
+        arch = "armv7hf"
+    return arch
 
 
 def glibc_version():
@@ -51,7 +60,7 @@ def check_platform():
     """Return (arch, problem if any)."""
     arch = current_arch()
     if arch is None:
-        return None, "Unsupported architecture {} (aarch64 or x86_64 required, 64-bit OS).".format(platform.machine())
+        return None, "Unsupported architecture {} (aarch64, x86_64 or 32-bit ARM required).".format(platform.machine())
     glibc = glibc_version()
     if glibc is not None and glibc < MIN_GLIBC:
         return arch, "glibc {}.{} is too old: {}.{} minimum (Debian 12 / OctoPi 1.1 or newer).".format(
@@ -134,7 +143,7 @@ def install_from_archive(archive_path, data_folder, expected_sha256=None):
                 shutil.rmtree(old)
         os.makedirs(engine_dir)
         shutil.move(engine, os.path.join(engine_dir, "CuraEngine"))
-        for extra in ("LICENSES", "VERSION"):
+        for extra in ("LICENSES", "VERSION", "NOTICE", "lib"):
             if os.path.exists(os.path.join(root, extra)):
                 shutil.move(os.path.join(root, extra), os.path.join(engine_dir, extra))
         shutil.move(resources, resources_dir)

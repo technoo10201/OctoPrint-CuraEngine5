@@ -1,0 +1,18 @@
+CuraEngine @VERSION@ (binary build)
+===================================
+
+This archive contains CuraEngine, licensed under the GNU Affero General Public
+License v3.0 (see LICENSES/CuraEngine-AGPL-3.0.txt), together with resources
+from Ultimaker/Cura (LGPL-3.0) and Ultimaker/fdm_materials (see LICENSES/),
+and Intel oneTBB (Apache-2.0, lib/libtbb.so.12).
+
+Corresponding source:
+  CuraEngine  https://github.com/Ultimaker/CuraEngine/tree/@VERSION@
+              plus LICENSES/curaengine-@VERSION@-portability.patch (build fixes only:
+              missing includes and a 32-bit size_t template deduction)
+  Cura        https://github.com/Ultimaker/Cura/tree/@VERSION@
+  Materials   https://github.com/Ultimaker/fdm_materials/tree/@VERSION@
+  Build       https://github.com/technoo10201/OctoPrint-CuraEngine5/tree/main/build
+              (Dockerfile.cross, cross-build.sh, cross.profile.in)
+
+This is an unofficial build, not provided or supported by UltiMaker.

@@ -1,0 +1,21 @@
+# Conan host profile template; @ARCH@ / @TRIPLE@ are filled in by cross-build.sh
+include(cura.jinja)
+
+[settings]
+arch=@ARCH@
+os=Linux
+compiler=gcc
+compiler.version=12
+compiler.libcxx=libstdc++11
+build_type=Release
+
+[buildenv]
+CC=@TRIPLE@-gcc
+CXX=@TRIPLE@-g++
+AR=@TRIPLE@-ar
+RANLIB=@TRIPLE@-ranlib
+STRIP=@TRIPLE@-strip
+LD=@TRIPLE@-ld
+
+[conf]
+tools.build:compiler_executables={"c": "@TRIPLE@-gcc", "cpp": "@TRIPLE@-g++"}

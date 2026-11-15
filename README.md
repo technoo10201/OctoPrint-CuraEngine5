@@ -22,7 +22,7 @@ An [OctoPrint](https://octoprint.org) plugin that slices STL files with **CuraEn
 ### Getting CuraEngine
 
 - **x86_64 PC**: extract the official AppImage (`./UltiMaker-Cura-5.11.0-linux-X64.AppImage --appimage-extract`) and point the plugin to `squashfs-root/CuraEngine` as the engine and `squashfs-root/share/cura/resources` as the resources. The plugin detects that this binary needs the dynamic loader and its bundled libraries, and starts it accordingly.
-- **Raspberry Pi (aarch64)**: UltiMaker does not publish ARM builds. The [`build-curaengine.yml`](.github/workflows/build-curaengine.yml) workflow builds CuraEngine for aarch64 and x86_64 and publishes an "engine + resources" archive. The "Download and install CuraEngine" button on the settings page installs it into the plugin's data folder after a SHA-256 check. Nothing is downloaded unless you click it.
+- **Raspberry Pi (32-bit armhf or 64-bit aarch64)**: UltiMaker does not publish ARM builds. The [`build-curaengine.yml`](.github/workflows/build-curaengine.yml) workflow builds CuraEngine for armv7hf, aarch64 and x86_64 and publishes an "engine + resources" archive. The "Download and install CuraEngine" button on the settings page installs it into the plugin's data folder after a SHA-256 check. Nothing is downloaded unless you click it.
 - A CuraEngine you built yourself works too.
 
 ## Installation

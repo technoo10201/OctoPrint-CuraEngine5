@@ -1,0 +1,14 @@
+# Build image for cross-compiling CuraEngine for 32-bit (armhf) and 64-bit (aarch64)
+# Raspberry Pi OS / Debian 12 targets. Debian 12 = glibc 2.36, gcc 12, like the targets.
+FROM debian:bookworm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential cmake ninja-build git ca-certificates curl xz-utils file pkg-config patchelf \
+    python3 python3-venv python3-pip \
+    gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf \
+    gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu \
+    qemu-user-static libc6-armhf-cross libc6-arm64-cross libstdc++6-armhf-cross libstdc++6-arm64-cross \
+ && rm -rf /var/lib/apt/lists/*
+RUN python3 -m venv /opt/conan && /opt/conan/bin/pip install -q "conan>=2.7,<3"
+ENV PATH=/opt/conan/bin:$PATH
+RUN conan profile detect --force \
+ && conan config install https://github.com/Ultimaker/conan-config.git
