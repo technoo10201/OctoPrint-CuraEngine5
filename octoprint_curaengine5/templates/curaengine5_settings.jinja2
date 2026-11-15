@@ -1,0 +1,190 @@
+<div id="settings_plugin_curaengine5">
+<h3>CuraEngine 5</h3>
+<p class="muted">Unofficial plugin. "Cura" is a trademark of UltiMaker.</p>
+
+<div class="alert" data-bind="css: { 'alert-success': status().configured, 'alert-error': !status().configured }">
+    <span data-bind="visible: status().configured">
+        CuraEngine <strong data-bind="text: status().engine_version || '?'"></strong> ready
+        (<code data-bind="text: status().engine_path"></code>).
+    </span>
+    <span data-bind="visible: !status().configured">
+        The engine or the Cura resources were not found. Enter their paths below.
+    </span>
+    <button class="btn btn-mini pull-right" data-bind="click: refreshStatus">Check</button>
+</div>
+
+<form class="form-horizontal" onsubmit="return false;">
+    <fieldset>
+        <legend>Engine and resources</legend>
+        <div class="control-group">
+            <label class="control-label">CuraEngine binary</label>
+            <div class="controls">
+                <input type="text" class="input-block-level" placeholder="automatic detection"
+                       data-bind="value: settings.plugins.curaengine5.engine_path">
+                <span class="help-block">Path to a CuraEngine 5.x. A binary extracted from an UltiMaker Cura
+                    AppImage is accepted as is.</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Cura resources</label>
+            <div class="controls">
+                <input type="text" class="input-block-level" placeholder="automatic detection"
+                       data-bind="value: settings.plugins.curaengine5.resources_path">
+                <span class="help-block"><code>share/cura/resources</code> folder (definitions,
+                    qualities, materials) of the same version as the engine.</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Additional resources</label>
+            <div class="controls">
+                <input type="text" class="input-block-level" placeholder="optional"
+                       data-bind="value: settings.plugins.curaengine5.extra_resources_path">
+                <span class="help-block">Folder containing your own <code>definitions/</code>,
+                    <code>extruders/</code> or <code>materials/</code>.</span>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Prebuilt engine</legend>
+        <p>Platform: <strong data-bind="text: platform().arch || 'not supported'"></strong>
+            <span class="text-error" data-bind="text: platform().problem"></span></p>
+        <div class="control-group">
+            <label class="control-label">Download URL</label>
+            <div class="controls">
+                <input type="text" class="input-block-level" placeholder="https://github.com/…/releases/download/engine-5.11.0"
+                       data-bind="value: settings.plugins.curaengine5.engine_download_url">
+                <span class="help-block">Release folder containing <code>SHA256SUMS</code> and
+                    <code>curaengine-5.11.0-linux-&lt;arch&gt;.tar.xz</code>. Nothing is downloaded without your click.</span>
+                <button class="btn" data-bind="click: installEngine, enable: !installing() && platform().arch && !platform().problem">
+                    <i class="fa fa-spinner fa-spin" data-bind="visible: installing"></i> Download and install CuraEngine
+                </button>
+                <span class="help-inline">Save the URL first.</span>
+                <div class="alert" data-bind="visible: installMessage, css: installOk() ? 'alert-success' : 'alert-error'">
+                    <span data-bind="text: installMessage"></span>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Printers</legend>
+        <p class="muted">Each printer creates an OctoPrint printer profile with the same name
+            ("Printer Profile" menu of the slicing dialog). Changes in this section
+            are saved immediately, without the settings "Save" button.</p>
+        <div class="alert alert-error" data-bind="visible: printerError, text: printerError"></div>
+        <table class="table table-condensed" data-bind="visible: printers().length">
+            <thead><tr><th>Name</th><th>Cura definition</th><th></th></tr></thead>
+            <tbody data-bind="foreach: printers">
+                <tr data-bind="css: { info: $root.current() && $root.current().id() === id }">
+                    <td><strong data-bind="text: name"></strong>
+                        <span class="label label-info" data-bind="visible: $data['default']">default</span></td>
+                    <td><code data-bind="text: definition"></code></td>
+                    <td class="text-right">
+                        <button class="btn btn-mini btn-primary" data-bind="click: $root.editPrinter">Edit / profiles</button>
+                        <button class="btn btn-mini btn-danger" data-bind="click: $root.deletePrinter"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p data-bind="visible: !printers().length" class="muted">No printers yet.</p>
+        <button class="btn" data-bind="click: wizard.open, visible: !wizard.visible()"><i class="fa fa-plus"></i> Add a printer</button>
+        <div class="well" data-bind="visible: wizard.visible"><div data-bind="with: wizard">{% include "curaengine5_wizard.jinja2" %}</div></div>
+    </fieldset>
+
+    <fieldset data-bind="with: current">
+        <legend>Printer: <span data-bind="text: name"></span></legend>
+        <div data-bind="with: machine">
+            {% include "curaengine5_printer_editor.jinja2" %}
+            <button class="btn btn-primary" data-bind="click: $root.savePrinter, enable: !$root.busy()">Save printer</button>
+            <button class="btn" data-bind="click: resetGcode">Restore the definition's G-codes</button>
+            <span class="text-success" data-bind="text: $root.printerMessage"></span>
+        </div>
+
+        <h4>Print profiles of this printer</h4>
+        <table class="table table-condensed" data-bind="visible: $root.profiles().length">
+            <thead><tr><th>Profile</th><th>Material</th><th>Quality</th><th></th></tr></thead>
+            <tbody data-bind="foreach: $root.profiles">
+                <tr><td data-bind="text: display_name"></td><td data-bind="text: material || '(printer)'"></td>
+                    <td data-bind="text: quality_type || '(default)'"></td>
+                    <td class="text-right">
+                        <button class="btn btn-mini" data-bind="click: $root.editProfile">Edit</button>
+                        <button class="btn btn-mini btn-danger" data-bind="click: $root.deleteProfile"><i class="fa fa-trash"></i></button>
+                    </td></tr>
+            </tbody>
+        </table>
+        <p class="muted" data-bind="visible: !$root.profiles().length">No profiles for this printer.</p>
+        <button class="btn" data-bind="click: $root.newProfile, visible: !$root.profile()"><i class="fa fa-plus"></i> New profile</button>
+
+        <div class="well" data-bind="with: $root.profile">
+            {% include "curaengine5_profile_editor.jinja2" %}
+            <button class="btn btn-primary" data-bind="click: $root.saveProfile, enable: !$root.busy()">Save profile</button>
+            <button class="btn" data-bind="click: $root.cancelProfile">Close</button>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Import a Cura profile</legend>
+        <p><code>.curaprofile</code> file exported by Cura, <code>.inst.cfg</code> file, or G-code produced
+            by Cura (the settings are read from the <code>;SETTING_3</code> block at the end of the file).</p>
+        <div class="control-group">
+            <label class="control-label">File</label>
+            <div class="controls">
+                <input type="file" id="curaengine5_import_file" accept=".curaprofile,.cfg,.gcode,.gco,.g">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Display name</label>
+            <div class="controls">
+                <input type="text" class="input-xlarge" placeholder="profile name in the file" data-bind="value: importDisplayName">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <label class="checkbox"><input type="checkbox" data-bind="checked: importDefault"> Default profile</label>
+                <label class="checkbox"><input type="checkbox" data-bind="checked: importOverwrite"> Replace a profile with the same name</label>
+                <button class="btn btn-primary" data-bind="click: importProfile, enable: !importing()">
+                    <i class="fa fa-spinner fa-spin" data-bind="visible: importing"></i> Import
+                </button>
+            </div>
+        </div>
+        <div class="alert" data-bind="visible: importMessage, css: importOk() ? 'alert-success' : 'alert-error'">
+            <span data-bind="text: importMessage"></span>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Advanced</legend>
+        <div class="control-group">
+            <label class="control-label">After uploading an STL</label>
+            <div class="controls">
+                <select class="input-xlarge" data-bind="value: settings.plugins.curaengine5.after_upload">
+                    <option value="tab">Open the Slicer tab with the model</option>
+                    <option value="none">Do nothing</option>
+                </select>
+                <span class="help-block">Applies when CuraEngine 5 is the only configured slicer.</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Threads</label>
+            <div class="controls">
+                <input type="number" min="0" max="9" class="input-mini" data-bind="value: settings.plugins.curaengine5.threads">
+                <span class="help-inline">0 = automatic</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Maximum duration (min)</label>
+            <div class="controls">
+                <input type="number" min="0" class="input-mini" data-bind="value: settings.plugins.curaengine5.timeout">
+                <span class="help-inline">0 = no limit</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <label class="checkbox"><input type="checkbox" data-bind="checked: settings.plugins.curaengine5.keep_temp_files"> Keep temporary files (diagnostics)</label>
+                <label class="checkbox"><input type="checkbox" data-bind="checked: settings.plugins.curaengine5.debug_logging"> Verbose logging</label>
+            </div>
+        </div>
+    </fieldset>
+</form>
+</div>

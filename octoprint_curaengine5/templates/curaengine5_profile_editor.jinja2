@@ -1,0 +1,54 @@
+            <div class="control-group">
+                <label class="control-label">Profile name</label>
+                <div class="controls"><input type="text" class="input-xlarge" data-bind="value: display_name"></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Material</label>
+                <div class="controls"><select class="input-xlarge" data-bind="options: $root.materials,
+                    optionsText: function (m) { return m.name + (m.brand ? ' (' + m.brand + ')' : ''); },
+                    optionsValue: 'id', value: material, optionsCaption: 'Printer material'"></select></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Quality</label>
+                <div class="controls"><select class="input-xlarge" data-bind="options: $root.qualityTypes,
+                    optionsText: 'name', optionsValue: 'id', value: quality_type"></select></div>
+            </div>
+            <ul class="nav nav-pills">
+                <li data-bind="css: { active: mode() === 'recommended' }"><a href="#" data-bind="click: function () { setMode('recommended'); }">Recommended</a></li>
+                <li data-bind="css: { active: mode() === 'custom' }"><a href="#" data-bind="click: function () { setMode('custom'); }">Custom</a></li>
+                <li class="pull-right" data-bind="visible: modifiedCount"><span class="label label-warning" data-bind="text: modifiedCount() + ' modified setting(s)'"></span></li>
+            </ul>
+            <div class="form-inline" data-bind="visible: mode() === 'custom'">
+                <select class="input-medium" data-bind="value: level">
+                    <option value="basic">Basic</option><option value="advanced">Advanced</option><option value="expert">Expert</option>
+                </select>
+                <input type="text" class="input-large" placeholder="Search settings…" data-bind="textInput: search">
+            </div>
+            <ul class="nav nav-tabs curaengine5-categories" data-bind="visible: mode() === 'custom' && !search(), foreach: categories">
+                <li data-bind="css: { active: $parent.category() === key }"><a href="#" data-bind="text: label, click: function () { $parent.category(key); }"></a></li>
+            </ul>
+            <div class="alert alert-error" data-bind="visible: rowsError, text: rowsError"></div>
+            <div data-bind="foreach: rows">
+                <div class="control-group curaengine5-row" data-bind="visible: enabled, css: { error: error() !== '', warning: error() === '' && warning() !== '', 'curaengine5-modified': modified }">
+                    <label class="control-label" data-bind="text: label, attr: { title: description }, style: { 'padding-left': (depth * 14) + 'px' }"></label>
+                    <div class="controls">
+                        <!-- ko if: type === 'bool' -->
+                        <input type="checkbox" data-bind="checked: value">
+                        <!-- /ko -->
+                        <!-- ko if: type === 'enum' -->
+                        <select class="input-large" data-bind="options: options, optionsText: 'label', optionsValue: 'key', value: value"></select>
+                        <!-- /ko -->
+                        <!-- ko if: type === 'float' || type === 'int' || type === 'str' -->
+                        <input type="text" class="input-medium" data-bind="value: value"> <span class="muted" data-bind="text: unit"></span>
+                        <!-- /ko -->
+                        <!-- ko if: !editable -->
+                        <code data-bind="text: JSON.stringify(value())"></code>
+                        <!-- /ko -->
+                        <button class="btn btn-mini" title="Reset to default value" data-bind="visible: modified, click: reset"><i class="fa fa-undo"></i></button>
+                        <span class="help-inline text-error" data-bind="text: error, visible: error"></span>
+                        <span class="help-inline text-warning" data-bind="text: warning, visible: !error() && warning()"></span>
+                    </div>
+                </div>
+            </div>
+            <p class="muted" data-bind="visible: !rows().length && !rowsError()">No settings to display.</p>
+            <div class="alert" data-bind="visible: $root.profileWarnings().length, text: $root.profileWarnings().join(' ')"></div>

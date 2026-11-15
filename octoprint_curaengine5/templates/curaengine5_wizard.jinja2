@@ -1,0 +1,19 @@
+<div class="curaengine5-tab curaengine5-wizard">
+    <input type="text" placeholder="Search (manufacturer or model)…" data-bind="textInput: search">
+    <div class="curaengine5-catalog" data-bind="foreach: groups">
+        <div class="curaengine5-group">
+            <strong data-bind="text: manufacturer"></strong>
+            <span class="muted" data-bind="text: '(' + machines.length + ')'"></span>
+            <div data-bind="foreach: machines">
+                <a href="#" class="curaengine5-machine" data-bind="text: name, click: $parents[1].pick, css: { active: $parents[1].pickedId() === id }"></a>
+            </div>
+        </div>
+    </div>
+    <p class="muted" data-bind="visible: !groups().length">No matching definition.</p>
+    <div data-bind="visible: pickedId">
+        <label>Printer name <input type="text" data-bind="value: newName"></label>
+        <button class="btn btn-small btn-primary" data-bind="click: create, enable: !busy()">Create</button>
+        <button class="btn btn-small" data-bind="click: close">Cancel</button>
+    </div>
+    <button class="btn btn-small" data-bind="click: close, visible: !pickedId()">Cancel</button>
+</div>

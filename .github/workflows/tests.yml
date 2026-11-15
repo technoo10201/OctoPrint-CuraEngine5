@@ -1,0 +1,25 @@
+# Plugin tests without the engine or Cura resources (tests that need them
+# are skipped); the build-curaengine.yml workflow runs them with the engine.
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python: ["3.9", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install "OctoPrint>=1.10,<1.12" pytest
+      - run: pip install -e .
+      - run: python -m pytest -q

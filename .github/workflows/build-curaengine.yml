@@ -1,0 +1,161 @@
+# Builds CuraEngine for Linux (aarch64 and x86_64) and publishes an
+# "engine + Cura resources" archive usable by the plugin.
+#
+# PREPARED, NOT YET RUN. Points to check on the first run:
+#   - access to UltiMaker's conan packages (public remote cura-conan2 installed
+#     by "conan config install");
+#   - duration: the first build (boost, onetbb...) can take 1 to 2 h.
+#
+# Built in a Debian 12 container (Bookworm, glibc 2.36, gcc 12) so that
+# the binary runs on OctoPi 1.1 / Raspberry Pi OS Bookworm: a binary
+# built directly on ubuntu-24.04 would require glibc 2.39.
+name: Build CuraEngine
+
+on:
+  workflow_dispatch:
+    inputs:
+      engine_version:
+        description: "CuraEngine version (git tag)"
+        default: "5.11.0"
+        required: true
+      release_tag:
+        description: "GitHub release tag to publish to (empty = artifacts only)"
+        default: ""
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: CuraEngine ${{ inputs.engine_version }} linux-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+          - arch: x86_64
+            runner: ubuntu-24.04
+    container:
+      image: debian:bookworm
+    env:
+      ENGINE_VERSION: ${{ inputs.engine_version }}
+      PKG: curaengine-${{ inputs.engine_version }}-linux-${{ matrix.arch }}
+      CONAN_HOME: /root/.conan2
+    steps:
+      - name: System packages
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build git ca-certificates curl xz-utils \
+            python3 python3-venv python3-pip pkg-config file
+          gcc --version | head -1
+          ldd --version | head -1
+
+      - name: Plugin sources (tests)
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Conan 2
+        run: |
+          python3 -m venv /opt/conan
+          /opt/conan/bin/pip install --upgrade pip
+          /opt/conan/bin/pip install "conan>=2.7,<3"
+          /opt/conan/bin/conan profile detect --force
+          /opt/conan/bin/conan config install https://github.com/Ultimaker/conan-config.git
+          /opt/conan/bin/conan remote list
+
+      - name: Conan cache
+        uses: actions/cache@v4
+        with:
+          path: /root/.conan2/p
+          key: conan-${{ matrix.arch }}-${{ inputs.engine_version }}-bookworm
+
+      - name: CuraEngine, Cura (resources) and fdm_materials sources
+        run: |
+          git clone --depth 1 --branch "$ENGINE_VERSION" https://github.com/Ultimaker/CuraEngine.git
+          git clone --depth 1 --branch "$ENGINE_VERSION" --filter=blob:none --sparse https://github.com/Ultimaker/Cura.git
+          git -C Cura sparse-checkout set resources/definitions resources/extruders resources/quality \
+            resources/intent resources/variants
+          git clone --depth 1 --branch "$ENGINE_VERSION" https://github.com/Ultimaker/fdm_materials.git
+
+      - name: Build (without Arcus or gRPC plugins, unneeded on the command line)
+        working-directory: CuraEngine
+        run: |
+          /opt/conan/bin/conan build . \
+            -s build_type=Release \
+            --build=missing --update \
+            -c tools.build:skip_test=True \
+            -o "curaengine/*:enable_arcus=False" \
+            -o "curaengine/*:enable_plugins=False" \
+            --profile cura.jinja
+          find . -maxdepth 4 -type f -name CuraEngine -perm -u+x
+
+      - name: Package
+        run: |
+          BIN=$(find CuraEngine -maxdepth 4 -type f -name CuraEngine -perm -u+x | head -1)
+          mkdir -p "$PKG/resources" "$PKG/LICENSES"
+          cp "$BIN" "$PKG/CuraEngine"
+          strip "$PKG/CuraEngine"
+          file "$PKG/CuraEngine"
+          echo "--- required dynamic libraries:"
+          ldd "$PKG/CuraEngine"
+          "$PKG/CuraEngine" help | head -3
+          cp -r Cura/resources/* "$PKG/resources/"
+          mkdir -p "$PKG/resources/materials"
+          cp fdm_materials/*.xml.fdm_material "$PKG/resources/materials/"
+          cp CuraEngine/LICENSE "$PKG/LICENSES/CuraEngine-AGPL-3.0.txt"
+          cp Cura/LICENSE "$PKG/LICENSES/Cura-resources-LGPL-3.0.txt"
+          cp fdm_materials/LICENSE "$PKG/LICENSES/fdm_materials.txt"
+          echo "$ENGINE_VERSION" > "$PKG/VERSION"
+          tar -cJf "$PKG.tar.xz" "$PKG"
+          sha256sum "$PKG.tar.xz" > "$PKG.tar.xz.sha256"
+          ls -la "$PKG.tar.xz"
+
+      - name: End-to-end check (plugin tests with this engine)
+        run: |
+          python3 -m venv /opt/test
+          /opt/test/bin/pip install "OctoPrint==1.11.8" pytest
+          /opt/test/bin/pip install -e plugin
+          cd plugin
+          CURAENGINE5_ENGINE="$GITHUB_WORKSPACE/$PKG/CuraEngine" \
+          CURAENGINE5_RESOURCES="$GITHUB_WORKSPACE/$PKG/resources" \
+            /opt/test/bin/python -m pytest -q tests/test_slicing.py tests/test_plugin.py
+
+      - name: Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PKG }}
+          path: |
+            ${{ env.PKG }}.tar.xz
+            ${{ env.PKG }}.tar.xz.sha256
+
+  release:
+    name: Publish to the release
+    needs: build
+    if: ${{ inputs.release_tag != '' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: SHA256SUMS
+        working-directory: dist
+        run: |
+          cat *.sha256 > SHA256SUMS
+          rm -f *.sha256
+          cat SHA256SUMS
+      - name: Upload to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "${{ inputs.release_tag }}" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "${{ inputs.release_tag }}" --repo "$GITHUB_REPOSITORY" --prerelease \
+              --title "CuraEngine ${{ inputs.engine_version }} (Linux binaries)" \
+              --notes "CuraEngine ${{ inputs.engine_version }} built for Linux aarch64/x86_64 (Debian 12), with the Cura resources. Unofficial project."
+          gh release upload "${{ inputs.release_tag }}" dist/* --repo "$GITHUB_REPOSITORY" --clobber

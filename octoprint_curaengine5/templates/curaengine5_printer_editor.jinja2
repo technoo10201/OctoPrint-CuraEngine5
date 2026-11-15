@@ -1,0 +1,35 @@
+<div class="curaengine5-tab curaengine5-printer-fields">
+    <label>Name <input type="text" data-bind="value: name"></label>
+    <div class="curaengine5-field">
+        <div class="curaengine5-field-title">Build volume</div>
+        <div class="curaengine5-xyz">
+            <div class="input-prepend input-append"><span class="add-on">X</span><input type="text" data-bind="value: width"><span class="add-on">mm</span></div>
+            <div class="input-prepend input-append"><span class="add-on">Y</span><input type="text" data-bind="value: depth"><span class="add-on">mm</span></div>
+            <div class="input-prepend input-append"><span class="add-on">Z</span><input type="text" data-bind="value: height"><span class="add-on">mm</span></div>
+        </div>
+    </div>
+    <div class="curaengine5-two">
+        <label>Build plate shape
+            <select data-bind="value: shape"><option value="rectangular">Rectangular</option><option value="elliptic">Elliptic</option></select></label>
+        <label>G-code flavor
+            <select data-bind="options: flavors, value: flavor"></select></label>
+    </div>
+    <div class="curaengine5-two">
+        <div class="curaengine5-field">
+            <div class="curaengine5-field-title">Nozzle diameter</div>
+            <div class="input-append"><input type="text" data-bind="value: nozzle"><span class="add-on">mm</span></div>
+        </div>
+        <div class="curaengine5-field">
+            <div class="curaengine5-field-title">Filament diameter</div>
+            <div class="input-append"><input type="text" data-bind="value: filament"><span class="add-on">mm</span></div>
+        </div>
+    </div>
+    <label class="checkbox"><input type="checkbox" data-bind="checked: centerIsZero"> Origin at center of build plate</label>
+    <label class="checkbox"><input type="checkbox" data-bind="checked: heatedBed"> Heated build plate</label>
+    <label>Start G-code
+        <textarea rows="10" class="curaengine5-gcode" data-bind="value: startGcode"></textarea></label>
+    <label>End G-code
+        <textarea rows="7" class="curaengine5-gcode" data-bind="value: endGcode"></textarea></label>
+    <p class="muted">Cura tokens are supported, for example <code>{material_print_temperature}</code>, <code>{if …}</code>…<code>{endif}</code>.</p>
+    <label class="checkbox"><input type="checkbox" data-bind="checked: isDefault"> Default printer</label>
+</div>

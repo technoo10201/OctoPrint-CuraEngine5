@@ -1,0 +1,132 @@
+#settings_plugin_curaengine5 .curaengine5-gcode {
+    font-family: monospace;
+    font-size: 12px;
+}
+
+#settings_plugin_curaengine5 .curaengine5-catalog { max-height: 260px; overflow-y: auto; margin: 8px 0; }
+#settings_plugin_curaengine5 .curaengine5-group { margin-bottom: 6px; }
+#settings_plugin_curaengine5 .curaengine5-machine { display: inline-block; margin: 2px 10px 2px 0; }
+#settings_plugin_curaengine5 .curaengine5-machine.active { font-weight: bold; text-decoration: underline; }
+#settings_plugin_curaengine5 .curaengine5-categories { margin-top: 8px; }
+#settings_plugin_curaengine5 .curaengine5-row.curaengine5-modified > .control-label { font-weight: bold; }
+#settings_plugin_curaengine5 .curaengine5-row .control-label { width: 260px; }
+#settings_plugin_curaengine5 .curaengine5-row .controls { margin-left: 280px; }
+.curaengine5-tab .curaengine5-canvas { width: 100%; aspect-ratio: 4 / 3; max-height: 62vh; min-height: 260px; border: 1px solid #ccc; background: #f4f6f8; position: relative; overflow: hidden; }
+.curaengine5-tab .curaengine5-hint { margin: 4px 0 8px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; }
+.curaengine5-tab .curaengine5-size { color: #444; white-space: nowrap; }
+.curaengine5-tab .curaengine5-sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 0 20px; }
+.curaengine5-tab section { padding: 0 0 8px; margin-bottom: 12px; border-bottom: 1px solid #e3e3e3; min-width: 0; }
+.curaengine5-tab section h5 { margin: 4px 0 10px; text-transform: uppercase; font-size: 11px; letter-spacing: .06em; color: #777; }
+.curaengine5-tab label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 12px; }
+.curaengine5-tab label.checkbox { font-weight: normal; margin: 4px 0 10px; }
+.curaengine5-tab select, .curaengine5-tab input[type=text] { box-sizing: border-box; width: 100%; margin: 3px 0 0; }
+.curaengine5-tab .curaengine5-upload { display: flex; gap: 8px; align-items: center; }
+.curaengine5-tab .curaengine5-filename { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.curaengine5-tab .curaengine5-modes { display: flex; margin-bottom: 10px; }
+.curaengine5-tab .curaengine5-modes .btn { flex: 1; white-space: nowrap; }
+.curaengine5-tab .curaengine5-field { margin-bottom: 8px; }
+.curaengine5-tab .curaengine5-field-title { font-weight: bold; font-size: 12px; margin-bottom: 3px; }
+.curaengine5-tab .curaengine5-xyz { display: flex; gap: 6px; }
+.curaengine5-tab .curaengine5-xyz .input-prepend { flex: 1 1 0; min-width: 0; margin: 0; display: flex; white-space: nowrap; }
+.curaengine5-tab .curaengine5-xyz .input-prepend input[type=text] { flex: 1 1 auto; min-width: 0; width: 100%; margin: 0; text-align: right; }
+.curaengine5-tab .curaengine5-xyz .add-on { flex: 0 0 auto; }
+.curaengine5-tab .curaengine5-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.curaengine5-tab .curaengine5-buttons .btn { white-space: nowrap; margin: 0; }
+.curaengine5-tab .curaengine5-canvas canvas { position: absolute; top: 0; left: 0; display: block; }
+.curaengine5-tab .curaengine5-progress { margin: 8px 0 0; display: flex; align-items: center; gap: 10px; }
+.curaengine5-tab .curaengine5-progress .progress { flex: 1; margin: 0; }
+.curaengine5-tab .curaengine5-progress span { white-space: nowrap; font-size: 12px; min-width: 90px; }
+.curaengine5-tab .curaengine5-slice:disabled { opacity: 1; }
+.curaengine5-tab .curaengine5-topbar { height: 4px; background: #dfe3e7; margin-bottom: 2px; }
+.curaengine5-tab .curaengine5-topbar > div { height: 100%; background: #1f8a4c; transition: width .25s; }
+.curaengine5-tab .curaengine5-topbar.curaengine5-error > div { background: #c9302c; width: 100% !important; }
+.curaengine5-tab .curaengine5-slice-row { display: flex; gap: 6px; }
+.curaengine5-tab .curaengine5-slice-row .curaengine5-slice { flex: 1; width: auto; }
+.curaengine5-tab .curaengine5-stage { margin: 4px 0 0; }
+.curaengine5-tab .curaengine5-stage3d { position: relative; }
+.curaengine5-tab .curaengine5-viewbar { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.curaengine5-tab .curaengine5-layers { position: absolute; top: 8px; right: 8px; bottom: 8px; width: 46px; display: flex; flex-direction: column; align-items: center; gap: 6px; background: rgba(255,255,255,.75); border-radius: 4px; padding: 4px 2px; }
+.curaengine5-tab .curaengine5-layer-label { font-size: 11px; white-space: nowrap; font-weight: bold; }
+.curaengine5-tab .curaengine5-layers input[type=range] { flex: 1; writing-mode: vertical-lr; direction: rtl; width: 24px; margin: 0; }
+.curaengine5-tab .curaengine5-legend { margin: 6px 0; }
+.curaengine5-tab .curaengine5-legend label { display: inline-block; margin: 0 12px 4px 0; font-weight: normal; }
+.curaengine5-tab .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; }
+.curaengine5-tab .curaengine5-editor { grid-column: 1 / -1; }
+.curaengine5-tab .curaengine5-editor .control-group { margin-bottom: 8px; }
+.curaengine5-tab .curaengine5-editor .control-label { float: none; width: auto; text-align: left; padding-top: 0; }
+.curaengine5-tab .curaengine5-editor .controls { margin-left: 0; }
+.curaengine5-tab .curaengine5-editor .curaengine5-row .control-label { width: auto; display: block; }
+.curaengine5-tab .curaengine5-editor .nav { margin: 0 0 8px; }
+.curaengine5-tab .curaengine5-editor .nav-tabs { margin: 8px 0; display: flex; flex-wrap: wrap; }
+.curaengine5-tab .curaengine5-editor select, .curaengine5-tab .curaengine5-editor input[type=text] { width: 100%; max-width: 320px; box-sizing: border-box; }
+.curaengine5-tab .curaengine5-editor input[type=checkbox] { width: auto; }
+.curaengine5-tab .curaengine5-editor-buttons { grid-template-columns: repeat(3, auto); justify-content: start; margin-top: 8px; }
+.curaengine5-tab .curaengine5-printer-editor textarea.curaengine5-gcode { width: 100%; box-sizing: border-box; font-family: monospace; font-size: 12px; margin-top: 3px; }
+.curaengine5-tab .curaengine5-printer-editor .input-append input { margin: 0; }
+.curaengine5-tab .curaengine5-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.curaengine5-tab .curaengine5-two .input-append input { width: 100%; min-width: 0; box-sizing: border-box; margin: 0; }
+.curaengine5-tab .curaengine5-two .input-append { display: flex; }
+.curaengine5-tab .curaengine5-printer-fields input[type=text], .curaengine5-tab .curaengine5-printer-fields select { max-width: none; }
+.curaengine5-tab .curaengine5-printer-fields textarea.curaengine5-gcode { width: 100%; box-sizing: border-box; font-family: monospace; font-size: 12px; margin-top: 3px; }
+.curaengine5-tab .curaengine5-catalog { max-height: 240px; overflow-y: auto; margin: 8px 0; }
+.curaengine5-tab .curaengine5-group { margin-bottom: 6px; }
+.curaengine5-tab .curaengine5-machine { display: inline-block; margin: 2px 10px 2px 0; }
+.curaengine5-tab .curaengine5-machine.active { font-weight: bold; text-decoration: underline; }
+.curaengine5-tab .input-append, .curaengine5-tab .input-prepend { display: flex; align-items: stretch; white-space: nowrap; }
+.curaengine5-tab .input-append input, .curaengine5-tab .input-prepend input { height: 30px; box-sizing: border-box; margin: 0; flex: 1 1 auto; min-width: 0; }
+.curaengine5-tab .input-append .add-on, .curaengine5-tab .input-prepend .add-on { height: 30px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding: 0 8px; flex: 0 0 auto; }
+.curaengine5-modal.modal { width: min(96vw, max(900px, 80vw)); left: 50%; margin-left: 0; transform: translateX(-50%); top: 5vh; max-height: 90vh; }
+.curaengine5-modal.curaengine5-modal-small.modal { width: min(94vw, 640px); }
+.curaengine5-tab .curaengine5-pending { font-size: 12px; padding: 6px 8px; margin: 6px 0; }
+.curaengine5-modal .modal-body { max-height: 66vh; overflow-y: auto; }
+.curaengine5-modal .modal-header h3 { margin: 0; font-size: 18px; }
+.curaengine5-modal .modal-header .close { margin-top: 2px; font-size: 26px; }
+.curaengine5-modal .modal-footer { text-align: right; }
+.curaengine5-modal .modal-footer .pull-left { line-height: 20px; }
+.curaengine5-modal .curaengine5-footnote { font-size: 12px; }
+.curaengine5-modal .curaengine5-wizard .curaengine5-catalog { max-height: 36vh; }
+.curaengine5-modal .modal-header .close { opacity: .6; }
+.curaengine5-modal .modal-header .close:hover { opacity: 1; }
+.curaengine5-tab .curaengine5-group { padding: 8px 10px 10px; margin-bottom: 8px; border: 1px solid #e3e3e3; border-radius: 4px; background: #fafafa; }
+.curaengine5-tab .curaengine5-group > label { margin-bottom: 6px; }
+.curaengine5-tab .curaengine5-buttons-3 { grid-template-columns: repeat(3, 1fr); }
+.curaengine5-tab .curaengine5-buttons-3 .btn { padding-left: 4px; padding-right: 4px; font-size: 12px; }
+.curaengine5-tab .curaengine5-group .curaengine5-buttons { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.curaengine5-tab .curaengine5-group .curaengine5-buttons .btn { white-space: normal; line-height: 1.2; padding-top: 5px; padding-bottom: 5px; }
+.curaengine5-tab .curaengine5-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.curaengine5-tab .curaengine5-sections > section.curaengine5-wide { grid-column: 1 / -1; }
+.curaengine5-tab .curaengine5-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; align-items: start; }
+@media (max-width: 560px) {
+    .curaengine5-tab .curaengine5-sections, .curaengine5-tab .curaengine5-pair { grid-template-columns: 1fr; }
+}
+.curaengine5-tab .curaengine5-pair { align-items: stretch; }
+.curaengine5-tab .curaengine5-top { margin-bottom: 8px; }
+.curaengine5-tab .curaengine5-top .curaengine5-group { margin-bottom: 4px; }
+.curaengine5-tab .curaengine5-make-default { grid-column: 1 / -1; }
+.curaengine5-tab .curaengine5-badge { margin-left: 6px; font-weight: normal; vertical-align: middle; }
+
+/* ---- Refonte : cartes ---- */
+.curaengine5-tab .curaengine5-layout { display: block; }
+.curaengine5-tab section.curaengine5-card { background: #f7f9fb; border: 1px solid #dde3ea; border-radius: 6px; padding: 8px 16px 16px; margin: 0 0 16px; }
+.curaengine5-tab .curaengine5-card > h5 { margin: 8px 0 16px; padding: 0 0 8px; border-bottom: 1px solid #e3e8ee; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #5b6673; }
+.curaengine5-tab .curaengine5-card > h5 .fa { margin-right: 6px; color: #7a8896; }
+.curaengine5-tab .curaengine5-card .curaengine5-group { background: transparent; border: 0; padding: 0; margin: 0; }
+.curaengine5-tab .curaengine5-pair { gap: 0 24px; }
+.curaengine5-tab .curaengine5-view { padding-bottom: 8px; }
+.curaengine5-tab .curaengine5-view .curaengine5-hint { margin: 8px 0 0; }
+.curaengine5-tab .curaengine5-modes { display: flex; margin: 0 0 16px; }
+.curaengine5-tab .curaengine5-modes .btn { flex: 1; white-space: nowrap; }
+.curaengine5-tab .curaengine5-placement-grid { display: grid; grid-template-columns: 88px repeat(3, minmax(0, 1fr)); gap: 8px; align-items: center; margin-bottom: 8px; }
+.curaengine5-tab .curaengine5-placement-grid .input-prepend { margin: 0; }
+.curaengine5-tab .curaengine5-row-label { font-weight: bold; font-size: 12px; }
+.curaengine5-tab .curaengine5-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.curaengine5-tab .curaengine5-actions .btn { margin: 0; white-space: normal; line-height: 1.2; padding: 8px 4px; }
+.curaengine5-tab .curaengine5-slice-card .curaengine5-two { gap: 0 16px; }
+.curaengine5-tab .curaengine5-slice-row { display: flex; gap: 8px; margin-top: 8px; }
+.curaengine5-tab .curaengine5-slice-row .curaengine5-slice { flex: 1; width: auto; height: 48px; font-size: 16px; }
+.curaengine5-tab .curaengine5-slice-row .btn-danger { height: 48px; }
+.curaengine5-tab .curaengine5-footnote { margin: 8px 0 0; font-size: 12px; }
+@media (max-width: 560px) {
+    .curaengine5-tab .curaengine5-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .curaengine5-tab .curaengine5-slice-card .curaengine5-two { grid-template-columns: 1fr; }
+}

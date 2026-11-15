@@ -1,0 +1,185 @@
+<div id="tab_plugin_curaengine5" class="curaengine5-tab">
+    <div class="curaengine5-layout">
+    <div class="alert alert-error" data-bind="visible: error, text: error"></div>
+
+    <section class="curaengine5-card curaengine5-top">
+        <h5><i class="fa fa-print"></i> Printer and profile</h5>
+            <div class="curaengine5-pair">
+            <div class="curaengine5-group">
+                <label>Printer
+                    <select data-bind="options: printers, optionsText: 'name', optionsValue: 'id', value: printerId, optionsCaption: 'Choose…'"></select></label>
+                <p class="muted" data-bind="visible: !printers().length">First add a printer in Settings &gt; CuraEngine 5.</p>
+                <div class="curaengine5-buttons">
+                    <button class="btn btn-small" data-bind="click: editPrinter, enable: printerId"><i class="fa fa-cog"></i> Printer settings</button>
+                    <button class="btn btn-small" data-bind="click: wizard.open"><i class="fa fa-plus"></i> Add a printer</button>
+                    <button class="btn btn-small btn-info curaengine5-make-default" data-bind="visible: canMakePrinterDefault, click: makePrinterDefault"><i class="fa fa-star"></i> Set as default printer</button>
+                </div>
+            </div>
+            <div class="curaengine5-group">
+                <label><span data-bind="text: txt.profile"></span> <span class="label label-info curaengine5-badge" data-bind="visible: currentPrinter() && !canMakeProfileDefault()">★ Default</span>
+                    <select data-bind="value: profileName, valueAllowUnset: true">
+                        <option value="" data-bind="text: '🔒 ' + txt.machineDefault"></option>
+                        <optgroup data-bind="attr: { label: txt.originGroup }, foreach: originProfiles">
+                            <option data-bind="value: name, text: '🔒 ' + display_name"></option>
+                        </optgroup>
+                        <optgroup data-bind="attr: { label: txt.mineGroup }, foreach: ownProfiles">
+                            <option data-bind="value: name, text: display_name"></option>
+                        </optgroup>
+                    </select></label>
+                <div class="alert alert-warning curaengine5-pending" data-bind="visible: pendingProfile">
+                    <i class="fa fa-pencil"></i> Settings modified but not saved: they will be used when slicing.
+                    <a href="#" data-bind="click: reopenProfile">Reopen</a> · <a href="#" data-bind="click: discardProfile">Discard</a>
+                </div>
+                <div class="curaengine5-buttons curaengine5-buttons-3">
+                    <button class="btn btn-small" data-bind="click: newProfile, enable: printerId"><i class="fa fa-plus"></i> New profile</button>
+                    <button class="btn btn-small" data-bind="click: editSelected, enable: canEditProfile, attr: { title: canEditProfile() ? '' : 'Default or imported profiles cannot be edited: use New profile or Duplicate' }"><i class="fa fa-sliders"></i> Edit profile</button>
+                    <button class="btn btn-small" data-bind="click: duplicateSelected, enable: selectedProfile" title="New profile based on this one"><i class="fa fa-copy"></i> Duplicate</button>
+                </div>
+            </div>
+            </div>
+
+    </section>
+
+    <section class="curaengine5-card curaengine5-view">
+        <h5><i class="fa fa-cube"></i> 3D view</h5>
+        <div class="curaengine5-topbar" data-bind="visible: phase() !== 'idle', css: 'curaengine5-' + phase()"><div data-bind="style: { width: progress() + '%' }"></div></div>
+        <div class="curaengine5-viewbar" data-bind="visible: previewReady">
+            <div class="btn-group">
+                <button class="btn btn-small" data-bind="click: function () { setView('model'); }, css: { active: view() === 'model' }"><i class="fa fa-cube"></i> Model</button>
+                <button class="btn btn-small" data-bind="click: function () { setView('preview'); }, css: { active: view() === 'preview' }"><i class="fa fa-th-list"></i> Preview</button>
+            </div>
+            <span class="muted" data-bind="visible: analysing">Analyzing G-code…</span>
+        </div>
+        <div class="curaengine5-stage3d">
+            <div class="curaengine5-canvas" id="curaengine5_canvas"></div>
+            <div class="curaengine5-layers" data-bind="visible: view() === 'preview' && layerMax() > 0">
+                <div class="curaengine5-layer-label" data-bind="text: layer() + ' / ' + layerMax()"></div>
+                <input type="range" min="1" step="1" orient="vertical" data-bind="attr: { max: layerMax }, value: layer, valueUpdate: 'input'">
+            </div>
+        </div>
+        <div class="curaengine5-legend" data-bind="visible: view() === 'preview', foreach: layerTypes">
+            <label class="checkbox inline"><input type="checkbox" data-bind="checked: visible">
+                <span class="swatch" data-bind="style: { background: color }"></span> <span data-bind="text: label"></span></label>
+        </div>
+        <p class="muted curaengine5-hint">Left click: orbit · wheel: zoom · right click: pan.
+            <span class="curaengine5-size" data-bind="visible: sizeText, text: sizeText"></span></p>
+        <div class="alert alert-warning" data-bind="visible: hasModel() && !fits()"><i class="fa fa-exclamation-triangle"></i> The model exceeds the printer's build volume.</div>
+    </section>
+
+    <section class="curaengine5-card">
+        <h5><i class="fa fa-folder-open"></i> Model to load</h5>
+            <label>OctoPrint files
+                <select data-bind="options: models, optionsText: 'path', optionsValue: 'path', value: modelPath, optionsCaption: 'Choose an STL…'"></select></label>
+            <div class="curaengine5-upload">
+                <input type="file" accept=".stl" id="curaengine5_tab_upload" style="display:none" data-bind="event: { change: fileChosen }">
+                <button class="btn btn-small" data-bind="click: pickFile"><i class="fa fa-folder-open"></i> Browse…</button>
+                <span class="curaengine5-filename muted" data-bind="text: uploadName() || 'No file'"></span>
+                <button class="btn btn-small" data-bind="click: uploadModel, enable: uploadName"><i class="fa fa-upload"></i> Upload</button>
+            </div>
+    </section>
+
+    <section class="curaengine5-card">
+        <h5><i class="fa fa-arrows"></i> Placement</h5>
+        <div class="btn-group curaengine5-modes">
+            <button class="btn" data-bind="click: function () { setMode('translate'); }, css: { active: mode() === 'translate' }"><i class="fa fa-arrows"></i> Move</button>
+            <button class="btn" data-bind="click: function () { setMode('rotate'); }, css: { active: mode() === 'rotate' }"><i class="fa fa-refresh"></i> Rotate</button>
+            <button class="btn" data-bind="click: function () { setMode('scale'); }, css: { active: mode() === 'scale' }"><i class="fa fa-expand"></i> Scale</button>
+        </div>
+        <div class="curaengine5-placement-grid">
+                <div class="curaengine5-row-label">Position</div><div class="input-prepend input-append"><span class="add-on">X</span><input type="text" data-bind="value: x"><span class="add-on">mm</span></div><div class="input-prepend input-append"><span class="add-on">Y</span><input type="text" data-bind="value: y"><span class="add-on">mm</span></div><span></span>
+                <div class="curaengine5-row-label">Rotation</div><div class="input-prepend input-append"><span class="add-on">X</span><input type="text" data-bind="value: rx"><span class="add-on">°</span></div><div class="input-prepend input-append"><span class="add-on">Y</span><input type="text" data-bind="value: ry"><span class="add-on">°</span></div><div class="input-prepend input-append"><span class="add-on">Z</span><input type="text" data-bind="value: rz"><span class="add-on">°</span></div>
+                <div class="curaengine5-row-label">Scale</div><div class="input-prepend input-append"><span class="add-on">X</span><input type="text" data-bind="value: sx"><span class="add-on">%</span></div><div class="input-prepend input-append"><span class="add-on">Y</span><input type="text" data-bind="value: sy"><span class="add-on">%</span></div><div class="input-prepend input-append"><span class="add-on">Z</span><input type="text" data-bind="value: sz"><span class="add-on">%</span></div>
+        </div>
+        <label class="checkbox"><input type="checkbox" data-bind="checked: uniform"> Uniform scale</label>
+        <div class="curaengine5-actions">
+            <button class="btn" data-bind="click: layFlat"><i class="fa fa-level-down"></i> Lay flat</button>
+            <button class="btn" data-bind="click: togglePick, css: { active: picking }"><i class="fa fa-hand-pointer-o"></i> Pick a face</button>
+            <button class="btn" data-bind="click: centerOnBed"><i class="fa fa-crosshairs"></i> Center</button>
+            <button class="btn" data-bind="click: resetTransform"><i class="fa fa-undo"></i> Reset</button>
+        </div>
+    </section>
+
+    <section class="curaengine5-card curaengine5-slice-card">
+        <h5><i class="fa fa-cogs"></i> Slicing</h5>
+        <div class="curaengine5-two">
+            <label>Output file
+                <input type="text" readonly data-bind="value: gcodeName() || '—'"></label>
+            <label>Supports
+                <select data-bind="value: supports">
+                    <option value="">As per profile</option>
+                    <option value="everywhere">Everywhere</option>
+                    <option value="buildplate">Touching build plate only</option>
+                    <option value="none">None</option>
+                </select></label>
+        </div>
+        <div class="curaengine5-slice-row">
+            <button class="btn btn-large btn-block curaengine5-slice" data-bind="click: slice, enable: canSlice,
+                css: { 'btn-primary': phase() === 'idle' || phase() === 'slicing', 'btn-success': phase() === 'done', 'btn-danger': phase() === 'error' },
+                style: { backgroundImage: phase() === 'slicing' ? 'linear-gradient(to right, #1f8a4c ' + progress() + '%, #0b5fa8 ' + progress() + '%)' : '' }">
+                <i class="fa" data-bind="css: { 'fa-cogs': phase() === 'idle', 'fa-spinner fa-spin': phase() === 'slicing', 'fa-check': phase() === 'done', 'fa-exclamation-triangle': phase() === 'error' }"></i>
+                <span data-bind="text: buttonText"></span></button>
+            <button class="btn btn-large btn-danger" data-bind="visible: phase() === 'slicing', click: cancelSlice, enable: !cancelling()">Cancel</button>
+        </div>
+        <p class="muted curaengine5-stage" data-bind="visible: phase() === 'slicing' && stage(), text: stage"></p>
+        <p class="muted curaengine5-footnote">The G-code is saved in the OctoPrint files.</p>
+    </section>
+    </div>
+</div>
+
+<!-- Modals: printer settings, profile settings, add a printer -->
+<div class="modal hide fade curaengine5-tab curaengine5-modal" data-bind="curaengine5Modal: printerOpen" tabindex="-1">
+    <div class="modal-header">
+        <button type="button" class="close" data-bind="click: closePrinter" aria-label="Close">&times;</button>
+        <h3>Printer settings</h3>
+    </div>
+    <div class="modal-body" data-bind="with: printerEdit">
+        {% include "curaengine5_printer_editor.jinja2" %}
+    </div>
+    <div class="modal-footer">
+        <button class="btn pull-left" data-bind="click: closePrinter">Close</button>
+        <span class="text-success curaengine5-footnote" data-bind="text: printerMessage"></span>
+        <button class="btn" data-bind="click: function () { printerEdit().resetGcode(); }"><i class="fa fa-undo"></i> Definition G-codes</button>
+        <button class="btn btn-primary" data-bind="click: savePrinter, enable: !busy()"><i class="fa fa-save"></i> Save</button>
+    </div>
+</div>
+
+<div class="modal hide fade curaengine5-tab curaengine5-modal" data-bind="curaengine5Modal: profileOpen" tabindex="-1">
+    <div class="modal-header">
+        <button type="button" class="close" data-bind="click: cancelProfile" aria-label="Close">&times;</button>
+        <h3>Profile settings <span class="label label-warning" data-bind="visible: profile() && profile().dirty()">modified, not saved</span></h3>
+    </div>
+    <div class="modal-body curaengine5-editor" data-bind="with: profile">
+        {% include "curaengine5_profile_editor.jinja2" %}
+    </div>
+    <div class="modal-footer">
+        <button class="btn pull-left" data-bind="click: cancelProfile">Close</button>
+        <button class="btn" data-bind="click: keepProfile" title="Keeps these values for the next slice"><i class="fa fa-check"></i> Use without saving</button>
+        <button class="btn" data-bind="click: saveProfileAs, enable: !busy()"><i class="fa fa-copy"></i> Save as…</button>
+        <button class="btn btn-primary" data-bind="click: saveProfile, enable: !busy()"><i class="fa fa-save"></i> Save</button>
+    </div>
+</div>
+
+<div class="modal hide fade curaengine5-tab curaengine5-modal curaengine5-modal-small" data-bind="curaengine5Modal: wizard.visible" tabindex="-1">
+    <div class="modal-header">
+        <button type="button" class="close" data-bind="click: wizard.close" aria-label="Close">&times;</button>
+        <h3>Add a printer</h3>
+    </div>
+    <div class="modal-body" data-bind="with: wizard">
+        {% include "curaengine5_wizard.jinja2" %}
+    </div>
+</div>
+</div>
+
+<div class="modal hide fade curaengine5-tab curaengine5-modal curaengine5-modal-small" data-bind="curaengine5Modal: overwriteAsk" tabindex="-1">
+    <div class="modal-header">
+        <button type="button" class="close" data-bind="click: overwriteNo" aria-label="Close">&times;</button>
+        <h3><i class="fa fa-exclamation-triangle"></i> File already exists</h3>
+    </div>
+    <div class="modal-body">
+        <p>Warning: the file <strong data-bind="text: overwriteAsk"></strong> already exists. It will be overwritten. Continue?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary curaengine5-no" data-bind="click: overwriteNo">No</button>
+        <button class="btn btn-danger" data-bind="click: overwriteYes">Yes, overwrite</button>
+    </div>
+</div>
