@@ -113,11 +113,12 @@
                 </select></label>
         </div>
         <div class="curaengine5-slice-row">
-            <button class="btn btn-large btn-block curaengine5-slice" data-bind="click: slice, enable: canSlice,
+            <button class="btn btn-large btn-block curaengine5-slice" data-bind="click: slice, enable: canSlice, attr: { title: printBusy() ? 'Slicing is disabled while printing' : '' },
                 css: { 'btn-primary': phase() === 'idle' || phase() === 'slicing', 'btn-success': phase() === 'done', 'btn-danger': phase() === 'error' },
                 style: { backgroundImage: phase() === 'slicing' ? 'linear-gradient(to right, #1f8a4c ' + progress() + '%, #0b5fa8 ' + progress() + '%)' : '' }">
                 <i class="fa" data-bind="css: { 'fa-cogs': phase() === 'idle', 'fa-spinner fa-spin': phase() === 'slicing', 'fa-check': phase() === 'done', 'fa-exclamation-triangle': phase() === 'error' }"></i>
                 <span data-bind="text: buttonText"></span></button>
+            <p class="text-warning" data-bind="visible: printBusy()">Slicing is disabled while printing</p>
             <button class="btn btn-large btn-danger" data-bind="visible: phase() === 'slicing', click: cancelSlice, enable: !cancelling()">Cancel</button>
         </div>
         <p class="muted curaengine5-stage" data-bind="visible: phase() === 'slicing' && stage(), text: stage"></p>

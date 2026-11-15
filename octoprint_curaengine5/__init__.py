@@ -263,7 +263,7 @@ class CuraEngine5Plugin(
         return {
             "type": SLICER_TYPE,
             "name": "CuraEngine 5",
-            "same_device": False,
+            "same_device": True,
             "progress_report": True,
             "source_file_types": ["stl"],
             "destination_extensions": ["gcode", "gco", "g"],
@@ -859,6 +859,8 @@ class CuraEngine5Plugin(
         from octoprint.filemanager import FileDestinations
         from octoprint.filemanager.util import DiskFileWrapper
 
+        if self._printer is not None and (self._printer.is_printing() or self._printer.is_paused()):
+            return flask.make_response("Slicing is disabled while printing", 409)
         body = flask.request.get_json(silent=True) or {}
         printer = self._find_printer(body.get("printer") or "")
         if printer is None:

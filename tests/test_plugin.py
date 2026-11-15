@@ -77,7 +77,7 @@ def _import_abs(plugin):
 
 def test_properties_and_configured(plugin):
     props = plugin.get_slicer_properties()
-    assert props["type"] == "curaengine5" and props["same_device"] is False
+    assert props["type"] == "curaengine5" and props["same_device"] is True
     assert props["source_file_types"] == ["stl"]
     assert plugin.is_slicer_configured()
 
@@ -268,3 +268,25 @@ def test_profile_overrides_route_per_extruder(plugin):
     g, e = ui.split_overrides(definition, flat)
     assert "layer_height" in g and "material_print_temperature" in e
     assert ui.flatten_overrides({"user": g, "user_extruders": [e]}) == flat
+
+
+@pytest.mark.parametrize("printing, paused", [(True, False), (False, True)])
+def test_api_slice_refused_while_printing(plugin, printing, paused):
+    import flask
+
+    class FakePrinter:
+        def is_printing(self):
+            return printing
+
+        def is_paused(self):
+            return paused
+
+    plugin._printer = FakePrinter()
+    app = flask.Flask(__name__)
+    with app.test_request_context("/slice", method="POST", json={}):
+        # bypass the permission decorator: call the undecorated function
+        fn = plugin_module.CuraEngine5Plugin.api_slice
+        fn = getattr(fn, "__wrapped__", fn)
+        resp = fn(plugin)
+    assert resp.status_code == 409
+    assert "disabled while printing" in resp.get_data(as_text=True)

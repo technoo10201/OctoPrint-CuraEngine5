@@ -27,6 +27,7 @@ $(function () {
         var self = this;
         var slicingVM = parameters[0];
         var settingsVM = parameters[1];
+        var printerStateVM = parameters[2];
         var assets = function (path) { return BASEURL + "plugin/curaengine5/static/" + path; };
         var api = function (path) { return OctoPrint.getBlueprintUrl("curaengine5") + path; };
 
@@ -76,8 +77,12 @@ $(function () {
         self.uniform = ko.observable(true);
         var names = ["x", "y", "rx", "ry", "rz", "sx", "sy", "sz"];
         _.each(names, function (n) { self[n] = ko.observable("0"); });
+        // slicing would compete with the print for the Pi's CPU and can stall it
+        self.printBusy = ko.pureComputed(function () {
+            return !!(printerStateVM && (printerStateVM.isPrinting() || printerStateVM.isPaused()));
+        });
         self.canSlice = ko.pureComputed(function () {
-            return self.hasModel() && !!self.printerId() && self.phase() !== "slicing";
+            return self.hasModel() && !!self.printerId() && self.phase() !== "slicing" && !self.printBusy();
         });
 
         var scene = null, loading = null, volume = null, silent = false;
@@ -523,7 +528,7 @@ $(function () {
 
     OCTOPRINT_VIEWMODELS.push({
         construct: CuraEngine5TabViewModel,
-        dependencies: ["slicingViewModel", "settingsViewModel"],
+        dependencies: ["slicingViewModel", "settingsViewModel", "printerStateViewModel"],
         elements: ["#tab_plugin_curaengine5"]
     });
 });
