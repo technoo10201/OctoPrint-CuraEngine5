@@ -1,0 +1,20 @@
+{
+  "machine": "eryone_thinker",
+  "global": {
+    "user": {"layer_height_0": "0.2"},
+    "quality_changes": "../data/custom_pla_global_qc.inst.cfg",
+    "quality": "res:quality/eryone_thinker/eryone_thinker_normal.inst.cfg",
+    "definition_changes": "../data/eryone_thinker_definition_changes.inst.cfg"
+  },
+  "extruders": [
+    {
+      "definition": "eryone_thinker_extruder_0",
+      "containers": {
+        "user": {"initial_layer_line_width_factor": "110"},
+        "quality_changes": "../data/custom_pla_extruder_qc.inst.cfg",
+        "quality": "res:quality/eryone_thinker/eryone_thinker_normal.inst.cfg",
+        "material": {"xml": "res:materials/generic_abs_175.xml.fdm_material"}
+      }
+    }
+  ]
+}

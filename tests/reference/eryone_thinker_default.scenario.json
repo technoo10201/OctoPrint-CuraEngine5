@@ -1,0 +1,14 @@
+{
+  "machine": "eryone_thinker",
+  "global": {
+    "quality": "res:quality/eryone_thinker/eryone_thinker_normal.inst.cfg"
+  },
+  "extruders": [
+    {
+      "definition": "eryone_thinker_extruder_0",
+      "containers": {
+        "quality": "res:quality/eryone_thinker/eryone_thinker_normal.inst.cfg"
+      }
+    }
+  ]
+}

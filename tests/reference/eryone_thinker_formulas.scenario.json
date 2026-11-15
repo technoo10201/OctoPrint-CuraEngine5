@@ -1,0 +1,31 @@
+{
+  "machine": "eryone_thinker",
+  "global": {
+    "user": {
+      "layer_height": "0.16",
+      "layer_height_0": "=layer_height * 1.5",
+      "adhesion_type": "brim",
+      "support_enable": "True",
+      "infill_sparse_density": "35",
+      "magic_spiralize": "False",
+      "speed_travel": "=speed_print * 4"
+    },
+    "quality": "res:quality/eryone_thinker/eryone_thinker_fine.inst.cfg",
+    "definition_changes": "../data/eryone_thinker_definition_changes.inst.cfg"
+  },
+  "extruders": [
+    {
+      "definition": "eryone_thinker_extruder_0",
+      "containers": {
+        "user": {
+          "machine_nozzle_size": "0.6",
+          "speed_print": "55",
+          "wall_line_count": "=3 if layer_height < 0.2 else 2",
+          "material_print_temperature": "235",
+          "retraction_amount": "5,5"
+        },
+        "quality": "res:quality/eryone_thinker/eryone_thinker_fine.inst.cfg"
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "machine": "creality_cr-x",
+  "global": {
+    "user": {
+      "adhesion_type": "brim",
+      "support_enable": "True",
+      "support_extruder_nr": "1",
+      "prime_tower_enable": "True"
+    }
+  },
+  "extruders": [
+    {
+      "definition": "cr-x_extruder_0",
+      "containers": {
+        "user": {"material_print_temperature": "205", "speed_print": "45"}
+      }
+    },
+    {
+      "definition": "cr-x_extruder_1",
+      "containers": {
+        "user": {"material_print_temperature": "230", "speed_print": "35", "retraction_amount": "6"}
+      }
+    }
+  ]
+}
