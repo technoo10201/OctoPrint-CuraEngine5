@@ -11,18 +11,20 @@ An [OctoPrint](https://octoprint.org) plugin that slices STL files with **CuraEn
 - **Mirrors Cura's slice preparation**: `{setting}`, `{setting, extruder}` and `{if ...}...{endif}` tokens in start/end G-code, no extra preheat when your start G-code already sets temperatures, the final header (`;TIME`, `;Filament used`, ...) and post-slice variables (`{print_time}`, `{filament_amount}`, `{jobname}`, ...).
 - **Imports your Cura profiles**: `.curaprofile`, `.inst.cfg`, or any G-code written by Cura (settings are read back from the trailing `;SETTING_3` block), including a G-code file already stored in OctoPrint.
 - **Uses Cura's resources**: 600+ printer definitions, qualities, intents, nozzle variants and XML materials (`.xml.fdm_material`).
-- **Slicer tab** in OctoPrint's interface to pick a printer and profile, load a model, place it on the bed in a 3D view and slice.
+- **Slicer tab** in OctoPrint's interface to pick a printer and profile, load a model, place it on the bed in a 3D view, slice, and preview the layers (walls, infill, supports...).
+- **Printer wizard and profile editor**: add a printer from Cura's catalog of 600+ definitions, then edit its settings and create profiles in a simple *Recommended* view or a full *Custom* view.
+- **Safe on a Raspberry Pi**: slicing is disabled while the printer is printing or paused (the Slice button is greyed out with "Slicing is disabled while printing", and the API answers 409).
 
 ## Requirements
 
 - OctoPrint 1.10 or later (tested with 1.11.8), Python 3.7+.
 - A **CuraEngine 5.x** binary for the machine running OctoPrint, plus the matching **`share/cura/resources`** folder from the same Cura version.
-- 64-bit Linux with **glibc 2.35 or later** for the CuraEngine shipped in UltiMaker's 5.11 AppImage (glibc 2.36 for the binaries built by this repository's workflow). OctoPi 1.1 / Raspberry Pi OS Bookworm (glibc 2.36) works; the official `octoprint/octoprint` Docker image (Debian 11, glibc 2.31) does **not**.
+- Linux with **glibc 2.35 or later** for the CuraEngine shipped in UltiMaker's 5.11 AppImage (x86_64 only; glibc 2.36 for the ARM binaries built by this repository's scripts, which target Raspberry Pi OS / Debian 12 Bookworm). The ARM 32-bit build requires an ARMv7 CPU (Raspberry Pi 2 and later, not the Pi Zero / Pi 1). OctoPi 1.1 / Raspberry Pi OS Bookworm (glibc 2.36) works; the official `octoprint/octoprint` Docker image (Debian 11, glibc 2.31) does **not**.
 
 ### Getting CuraEngine
 
 - **x86_64 PC**: extract the official AppImage (`./UltiMaker-Cura-5.11.0-linux-X64.AppImage --appimage-extract`) and point the plugin to `squashfs-root/CuraEngine` as the engine and `squashfs-root/share/cura/resources` as the resources. The plugin detects that this binary needs the dynamic loader and its bundled libraries, and starts it accordingly.
-- **Raspberry Pi (32-bit armhf or 64-bit aarch64)**: UltiMaker does not publish ARM builds. The [`build-curaengine.yml`](.github/workflows/build-curaengine.yml) workflow builds CuraEngine for armv7hf, aarch64 and x86_64 and publishes an "engine + resources" archive. The "Download and install CuraEngine" button on the settings page installs it into the plugin's data folder after a SHA-256 check. Nothing is downloaded unless you click it.
+- **Raspberry Pi (32-bit armhf or 64-bit aarch64)**: UltiMaker does not publish ARM builds. [`build/cross-build.sh`](build/cross-build.sh) cross-compiles CuraEngine 5.11.0 for armv7hf and aarch64 in a Debian 12 container (see [Building the engine](#building-the-engine)), and the [`build-curaengine.yml`](.github/workflows/build-curaengine.yml) workflow builds the x86_64 and aarch64 engines natively; each produces an "engine + resources" archive. The "Download and install CuraEngine" button on the settings page installs it into the plugin's data folder after a SHA-256 check. Nothing is downloaded unless you click it.
 - A CuraEngine you built yourself works too.
 
 ## Installation
@@ -61,7 +63,35 @@ You can also slice from OctoPrint's file list: the "Slice" icon of an STL offers
 
 ## Screenshots
 
-Screenshots of the Slicer tab and of the settings page will be added to this repository.
+### Slicer tab
+
+![Slicer tab: printer, profile and a model on the build plate](docs/screenshots/slicer-model.png)
+
+### Layer preview with supports
+
+![Layer preview with supports](docs/screenshots/slicer-preview.png)
+
+### Print profile (Recommended and Custom views)
+
+![Profile settings, Recommended view](docs/screenshots/profile-recommended.png)
+![Profile settings, Custom view](docs/screenshots/profile-custom.png)
+
+### Printer settings
+
+![Printer settings](docs/screenshots/printer-settings.png)
+
+### Adding a printer
+
+![Add a printer wizard](docs/screenshots/add-printer.png)
+
+## Building the engine
+
+[`build/`](build) contains everything needed to rebuild the ARM engine binaries: a Dockerfile, the conan host profile, the build script and the small portability patch applied to CuraEngine 5.11.0 (missing includes, and a 32-bit `size_t` fix). Each engine archive also contains a `NOTICE` file with the location of the corresponding source (CuraEngine is AGPL-3.0).
+
+```bash
+docker build -t curaengine-cross -f build/Dockerfile.cross build
+docker run --rm -v "$PWD/build:/build:ro" -v "$PWD/out:/out" curaengine-cross bash /build/cross-build.sh armv7hf   # or aarch64
+```
 
 ## Development and tests
 
