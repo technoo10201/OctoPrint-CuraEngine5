@@ -29,7 +29,7 @@ An [OctoPrint](https://octoprint.org) plugin that slices STL files with **CuraEn
 
 ## Installation
 
-Once the repository is published, use *Plugin Manager > Get More... > from URL* with the address of the repository archive. For development:
+In OctoPrint, open *Plugin Manager > Get More... > ... from URL* and enter `https://github.com/technoo10201/OctoPrint-CuraEngine5/archive/refs/tags/v0.1.0.zip`. For development:
 
 ```bash
 pip install -e .

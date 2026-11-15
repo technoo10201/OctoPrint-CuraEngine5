@@ -96,7 +96,7 @@ class CuraEngine5Plugin(
             "timeout": 0,
             "keep_temp_files": False,
             "debug_logging": False,
-            "engine_download_url": "",
+            "engine_download_url": "https://github.com/technoo10201/OctoPrint-CuraEngine5/releases/download/v0.1.0",
         }
 
     def on_settings_load(self):
