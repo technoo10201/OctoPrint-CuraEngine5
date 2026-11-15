@@ -1,5 +1,7 @@
 # OctoPrint-CuraEngine5
 
+![The Slicer tab: layer preview with supports](docs/screenshots/slicer-preview.png)
+
 An [OctoPrint](https://octoprint.org) plugin that slices STL files with **CuraEngine 5.x** (tested with 5.11.0), directly from OctoPrint. It succeeds "CuraEngine Legacy", which only supports CuraEngine 15.04.
 
 > **Unofficial project.** "Cura" and "UltiMaker" are trademarks of UltiMaker. This project is not affiliated with or endorsed by UltiMaker. CuraEngine is free software by UltiMaker, licensed under AGPL-3.0.
