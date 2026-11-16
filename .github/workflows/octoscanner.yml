@@ -1,0 +1,38 @@
+# Static analysis of the plugin with octoscanner (deprecated/removed OctoPrint APIs, XSS and other
+# security issues, packaging problems). octoscanner exits with 1 when it finds an issue.
+name: Octoscanner
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout the plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Checkout octoscanner
+        uses: actions/checkout@v4
+        with:
+          repository: jacopotediosi/octoscanner
+          ref: db5d3f532d7d3c5151e8bd408f1330b43d9fe9b9
+          path: octoscanner
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install octoscanner
+        run: pip install ./octoscanner
+
+      - name: Scan the plugin
+        working-directory: octoscanner
+        run: octoscanner scan --no-color ../plugin
