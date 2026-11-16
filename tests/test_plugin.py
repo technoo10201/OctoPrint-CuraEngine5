@@ -297,3 +297,35 @@ def test_software_update_information(plugin):
     assert info["type"] == "github_release"
     assert (info["user"], info["repo"]) == ("technoo10201", "OctoPrint-CuraEngine5")
     assert info["pip"].endswith("/archive/{target_version}.zip")
+
+
+def test_pnotify_calls_escape_their_text():
+    """PNotify v2 renders text as HTML unless text_escape is set: server messages must stay plain text."""
+    import glob
+    import os
+
+    base = os.path.join(os.path.dirname(plugin_module.__file__), "static", "js")
+    found = 0
+    for path in glob.glob(os.path.join(base, "*.js")):
+        source = open(path, encoding="utf-8").read()
+        for match in re.finditer(r"new PNotify\(\{", source):
+            found += 1
+            depth, i = 1, match.end()
+            while depth and i < len(source):
+                depth += {"{": 1, "}": -1}.get(source[i], 0)
+                i += 1
+            block = source[match.start():i]
+            assert "text_escape: true" in block, "{}: PNotify without text_escape".format(os.path.basename(path))
+    assert found >= 2
+
+
+def test_no_html_rendering_in_templates_and_scripts():
+    import glob
+    import os
+
+    root = os.path.dirname(plugin_module.__file__)
+    files = glob.glob(os.path.join(root, "templates", "*.jinja2")) + glob.glob(os.path.join(root, "static", "js", "*.js"))
+    for path in files:
+        source = open(path, encoding="utf-8").read()
+        for sink in ("|safe", "html:", ".html(", "innerHTML", "insertAdjacentHTML", "document.write"):
+            assert sink not in source, "{} uses {}".format(os.path.basename(path), sink)

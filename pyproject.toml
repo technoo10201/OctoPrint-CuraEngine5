@@ -1,34 +1,43 @@
 [build-system]
-requires = ["setuptools>=67", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "OctoPrint-CuraEngine5"
-version = "0.1.1"
+version = "0.1.2"
 description = "OctoPrint slicer plugin for CuraEngine 5.x (unofficial)"
-readme = "README.md"
-authors = [{ name = "technoo10201" }]
-license = { text = "AGPL-3.0-or-later" }
-requires-python = ">=3.9, <4"
-dependencies = []
-classifiers = [
-    "Framework :: OctoPrint",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
-    "Programming Language :: Python :: 3",
-    "Natural Language :: English",
+authors = [
+    {name = "technoo10201"}
+]
+readme = {file = "README.md", content-type = "text/markdown"}
+dynamic = [
+    "license"
 ]
 
-[project.entry-points."octoprint.plugin"]
-curaengine5 = "octoprint_curaengine5"
+requires-python = ">=3.9, <4"
 
-[project.optional-dependencies]
-develop = ["pytest"]
+# any additional requirements (besides OctoPrint) should be listed here
+dependencies = []
 
 [tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.packages.find]
-include = ["octoprint_curaengine5", "octoprint_curaengine5.*"]
+include = [
+    "octoprint_curaengine5",
+    "octoprint_curaengine5.*"
+]
+
+[project.entry-points."octoprint.plugin"]
+curaengine5 = "octoprint_curaengine5"
+
+[project.urls]
+Homepage = "https://github.com/technoo10201/OctoPrint-CuraEngine5"
+
+[project.optional-dependencies]
+develop = [
+    "pytest"
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
