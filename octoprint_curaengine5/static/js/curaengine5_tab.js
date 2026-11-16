@@ -478,12 +478,14 @@ $(function () {
             var path = data.gcode;
             var load = function (print) {
                 OctoPrint.files.select("local", path, print).fail(function (xhr) {
-                    new PNotify({title: "Could not load", text: xhr.responseText || xhr.statusText, type: "error"});
+                    new PNotify({title: "Could not load", text: xhr.responseText || xhr.statusText, text_escape: true, type: "error"});
                 });
             };
             new PNotify({
                 title: data.ok ? "Slicing complete" : "Slicing failed",
+                // path and error come from the server (file names, engine output): render them as plain text
                 text: data.ok ? path + " is in the OctoPrint files." : data.error,
+                text_escape: true, title_escape: true,
                 type: data.ok ? "success" : "error", hide: !data.ok ? false : false,
                 confirm: data.ok ? {
                     confirm: true,
